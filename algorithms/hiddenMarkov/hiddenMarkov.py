@@ -1,1 +1,66 @@
-ÿþ
+import readInput
+import random
+
+maxObservations = 10
+
+def getObsSeq(startState, statesD, maxO):
+    states = list(statesD.keys())
+    seq = []
+
+    for _ in range(maxO):
+        state = startState if len(seq) == 0 else random.choice(states)
+        em = statesD[state]['emissions']
+
+        seq.append(random.choices(range(len(em)), weights=em, k=1)[0])
+    return seq
+
+def algo(startState, statesD):
+
+    obs = getObsSeq(startState, statesD, maxObservations)
+    states = list(statesD.keys())
+    numStates = len(states)
+    numObs = len(obs)
+
+    V = [{} for _ in range(numObs)] # Setting up blank table
+    path = {} # settings up blank path
+
+    for state in states:
+        if state == startState:
+            V[0][state] = 1
+        else:
+            V[0][state] = 0
+        path[state] = [state]
+
+    for step in range(1, obs):
+        newPath = {}
+
+        for curr in states:
+            maxProb = -1
+            prevStateSel = None
+            emProb = statesD[curr]['emissions'][obs[step]]
+
+            for prevState in states:
+                prob = V[step-1][prevState] * statesD[prevState]['transition'][states.index(curr)] * emProb
+                if prob > maxProb:
+                    maxProb = prob
+                    prevStateSel = prevState
+
+            V[step][curr] = maxProb
+            newPath[curr] = path[prevStateSel] + [curr]
+
+        path = newPath
+
+    maxProb = -1
+    lastState = None
+    for state in states:
+        if V[-1][state] > maxProb:
+            maxProb = V[-1][state]
+            lastState = state
+        
+    bestPath = path[lastState]
+
+if __name__ == "__main__":
+    start, states = readInput.readInput('Input.txt')
+
+    print(str(start) + "\n" + str(states)) 
+
