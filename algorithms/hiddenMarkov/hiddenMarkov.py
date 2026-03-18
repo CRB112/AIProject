@@ -3,6 +3,7 @@ import random
 
 maxObservations = 10
 
+#Returns an observation sequence []
 def getObsSeq(startState, statesD, maxO):
     states = list(statesD.keys())
     seq = []
@@ -23,6 +24,7 @@ def algo(startState, statesD):
 
     V = [{} for _ in range(numObs)] # Setting up blank table
     path = {} # settings up blank path
+    
 
     for state in states:
         if state == startState:
@@ -31,7 +33,8 @@ def algo(startState, statesD):
             V[0][state] = 0
         path[state] = [state]
 
-    for step in range(1, obs):
+    print("Start state is " + str(startState) + "\n")
+    for step in range(1, numObs):
         newPath = {}
 
         for curr in states:
@@ -40,7 +43,7 @@ def algo(startState, statesD):
             emProb = statesD[curr]['emissions'][obs[step]]
 
             for prevState in states:
-                prob = V[step-1][prevState] * statesD[prevState]['transition'][states.index(curr)] * emProb
+                prob = V[step-1][prevState] * statesD[prevState]['transitions'][states.index(curr)] * emProb
                 if prob > maxProb:
                     maxProb = prob
                     prevStateSel = prevState
@@ -48,7 +51,14 @@ def algo(startState, statesD):
             V[step][curr] = maxProb
             newPath[curr] = path[prevStateSel] + [curr]
 
+
+
         path = newPath
+        bestCurr = max(V[step], key=V[step].get)
+        print(f"Step {step}, Observation: {obs[step]}")
+        print(f"Best state: {bestCurr}, prob = {V[step][bestCurr]}")
+        print(f"Current best path: {path[bestCurr]}")
+        print("======Next Step======\n")
 
     maxProb = -1
     lastState = None
@@ -59,8 +69,11 @@ def algo(startState, statesD):
         
     bestPath = path[lastState]
 
+    print("Observations -> " + str(obs))
+    print("Best Path    -> " + str(bestPath))
+
 if __name__ == "__main__":
     start, states = readInput.readInput('Input.txt')
 
-    print(str(start) + "\n" + str(states)) 
+    algo(start, states)
 
