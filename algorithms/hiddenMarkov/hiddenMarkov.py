@@ -19,7 +19,6 @@ def algo(startState, statesD):
 
     obs = getObsSeq(startState, statesD, maxObservations)
     states = list(statesD.keys())
-    numStates = len(states)
     numObs = len(obs)
 
     V = [{} for _ in range(numObs)] # Setting up blank table
