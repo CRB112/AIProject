@@ -4,9 +4,6 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import pandas as pd
 
-learningRate_ = 0.015
-epochs = 2000
-
 def relu(x):
     return np.maximum(0, x)
 
@@ -114,14 +111,21 @@ def generateData():
     plt.legend()
     plt.show()
 
+    epochs = int(input("How many Epochs would you like? ->"))
+    learningRate = float(input("What learning rate would you like? ->"))
+    hiddenLayerCount = int(input("How many hidden layers would you like? ->"))
+    layers = []
+    for i in range(hiddenLayerCount):
+        layers.append(int(input(f"Input node count for layer {i}")))
 
-    return Xr, Xt, Yr, Yt
+
+    return Xr, Xt, Yr, Yt, layers, epochs, learningRate
 
 if __name__ == "__main__":
-    Xr, Xt, Yr, Yt = generateData()
+    Xr, Xt, Yr, Yt, layers, epochs, learningRate = generateData()
     
-    nn = NN(inSize=4, hiddenLayers=[5, 5], outSize=1)
-    nn.fit(Xr, Yr, epochs=epochs, learningRate=learningRate_)
+    nn = NN(inSize=4, hiddenLayers=layers, outSize=1)
+    nn.fit(Xr, Yr, epochs=epochs, learningRate=learningRate)
 
     preds = nn.predict(Xt)
     pred_labels = (preds > 0.5).astype(int)
