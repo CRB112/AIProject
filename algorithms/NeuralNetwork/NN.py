@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-
+import matplotlib.pyplot as plt
+import pandas as pd
 
 learningRate_ = 0.015
 epochs = 2000
@@ -43,7 +44,7 @@ class NN:
         for i in range(len(self.weights) - 1):
             z = np.dot(a, self.weights[i]) + self.biases[i]
             a = relu(z)
-            activations.append(z)
+            activations.append(a)
 
         z = np.dot(a, self.weights[-1]) + self.biases[-1]
         output = sigmoid(z)  # Sigmoid for output layer
@@ -95,6 +96,24 @@ def generateData():
 
     Xr, Xt, Yr, Yt = train_test_split(X, y, test_size=0.3)
 
+    df = pd.DataFrame(X, columns=iris.feature_names)
+    df['species'] = [iris.target_names[i] for i in y.flatten()]
+
+    # Scatter plot: Sepal Length vs Sepal Width
+    plt.figure(figsize=(8, 6))
+    species_colors = {'setosa': 'blue', 'versicolor': 'green'}
+
+    for species, color in species_colors.items():
+        subset = df[df['species'] == species]
+        plt.scatter(subset['sepal length (cm)'], subset['sepal width (cm)'],
+                    label=species, color=color, alpha=0.7)
+
+    plt.xlabel('Sepal Length (cm)')
+    plt.ylabel('Sepal Width (cm)')
+    plt.title('Sepal Length vs Sepal Width (2 Species)')
+    plt.legend()
+    plt.show()
+
 
     return Xr, Xt, Yr, Yt
 
@@ -104,16 +123,19 @@ if __name__ == "__main__":
     nn = NN(inSize=4, hiddenLayers=[5, 5], outSize=1)
     nn.fit(Xr, Yr, epochs=epochs, learningRate=learningRate_)
 
-    preds = nn.predict(Xr)
+    preds = nn.predict(Xt)
     pred_labels = (preds > 0.5).astype(int)
 
+    pred_species = ['setosa' if x==0 else 'versicolor' for x in pred_labels.flatten()]
+    actual_species = ['setosa' if x==0 else 'versicolor' for x in Yt.flatten()]
+
     print("Predictions (last 10):")
-    print(pred_labels[-10:])
+    print(pred_species[-10:])
 
     print("Actual (last 10):")
-    print(Yt[-10:])
+    print(actual_species[-10:])
 
-    accuracy = np.mean(pred_labels == Yr)
+    accuracy = np.mean(pred_labels == Yt)
     print(f"Accuracy: {accuracy * 100:.2f}%")
 
         
