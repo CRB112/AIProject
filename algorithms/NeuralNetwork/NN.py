@@ -8,8 +8,6 @@ import pandas as pd
 #Loaded matplot graph will only show two of the four
 #But will satisfy in visualizing spread
 
-
-
 #Relu is better for hidden layers since it dynamically returns
 #Higher values from nodes with more effect
 def relu(x):
